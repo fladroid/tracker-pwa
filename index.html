@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#2D5A27">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Tracker">
+  <title>Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { background: #F5F0E8; }
+    #app {
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    button { -webkit-tap-highlight-color: transparent; }
+    select { -webkit-appearance: none; appearance: none; }
+    textarea { outline: none; }
+    input[type="date"] { -webkit-appearance: none; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #DDD8CE; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div style="display:flex;height:100%;align-items:center;justify-content:center;
+      font-family:monospace;font-size:13px;color:#9A9590">
+      Loading...
+    </div>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
