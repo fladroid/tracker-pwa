@@ -137,7 +137,7 @@ async function init() {
   }
 
   await loadHomeData();
-  render();
+  await render();
 }
 
 async function loadHomeData() {
@@ -146,7 +146,7 @@ async function loadHomeData() {
 }
 
 // ─── RENDERING ───────────────────────────────────────────────
-function render() {
+async function render() {
   const app = document.getElementById('app');
   app.style.background = theme('background');
   app.style.color      = theme('ink');
@@ -154,10 +154,10 @@ function render() {
   app.style.fontSize   = css('body');
 
   switch (state.screen) {
-    case 'home':     app.innerHTML = renderHome();     break;
-    case 'history':  app.innerHTML = renderHistory();  break;
-    case 'report':   app.innerHTML = renderReport();   break;
-    case 'settings': app.innerHTML = renderSettings(); break;
+    case 'home':     app.innerHTML = renderHome();            break;
+    case 'history':  app.innerHTML = await renderHistory();   break;
+    case 'report':   app.innerHTML = await renderReport();    break;
+    case 'settings': app.innerHTML = await renderSettings();  break;
   }
   bindEvents();
 }
@@ -176,8 +176,8 @@ function renderHome() {
     const val = state.values[btn.id] || 0;
     return `
     <div class="counter-btn" style="
-      background:${theme('surface')};
-      border:1px solid ${theme('border')};
+      background:${val>0 ? theme('accent')+'12' : theme('surface')};
+      border:1px solid ${val>0 ? theme('accent') : theme('border')};
       border-radius:8px;
       padding:10px 6px;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -799,7 +799,7 @@ function bindEvents() {
   document.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', async () => {
       state.screen = el.dataset.nav;
-      render();
+      await render();
     });
   });
 
@@ -815,7 +815,7 @@ function bindEvents() {
       const newVal = await DB.changeValue(id, state.selectedDate, delta);
       await DB.addLog({ type:'counter', buttonId:id, delta, timestamp:state.selectedDate });
       state.values[id] = newVal;
-      render();
+      await render();
     });
   });
 
@@ -831,7 +831,7 @@ function bindEvents() {
       if (result === null) return;
       await DB.saveTextValue(id, state.selectedDate, result, state.selectedDate);
       state.textValues[id] = result;
-      render();
+      await render();
     });
   });
 
@@ -839,12 +839,12 @@ function bindEvents() {
   document.querySelector('[data-action="nav-prev"]')?.addEventListener('click', () => {
     state.selectedDate = new Date(state.selectedDate.getTime() - 86400000);
     state.screen = 'home';
-    loadHomeData().then(render);
+    loadHomeData().then(async () => await render());
   });
   document.querySelector('[data-action="nav-next"]')?.addEventListener('click', () => {
     state.selectedDate = new Date(state.selectedDate.getTime() + 86400000);
     state.screen = 'home';
-    loadHomeData().then(render);
+    loadHomeData().then(async () => await render());
   });
 
   // Reset day
@@ -861,7 +861,7 @@ function bindEvents() {
     await DB.resetDayToZero({ date:state.selectedDate, counterIds, textIds, currentValues:state.values });
     counterIds.forEach(id => state.values[id] = 0);
     textIds.forEach(id => state.textValues[id] = '');
-    render();
+    await render();
   });
 
   // Lang select (home)
@@ -869,14 +869,14 @@ function bindEvents() {
     state.lang = e.target.value;
     LS.set('lang', state.lang);
     applyTranslations();
-    render();
+    await render();
   });
 
   // History period
   document.querySelectorAll('[data-hist-period]').forEach(el => {
     el.addEventListener('click', () => {
       state.historyPeriod = el.dataset.histPeriod;
-      render();
+      await render();
     });
   });
   document.getElementById('range-btn')?.addEventListener('click', () => {
@@ -886,19 +886,19 @@ function bindEvents() {
       state.historyRangeFrom = DB.dateKey(from);
       state.historyRangeTo   = DB.dateKey(new Date());
     }
-    render();
+    await render();
   });
   document.getElementById('range-apply')?.addEventListener('click', () => {
     state.historyRangeFrom = document.getElementById('range-from')?.value;
     state.historyRangeTo   = document.getElementById('range-to')?.value;
-    render();
+    await render();
   });
 
   // Report period
   document.querySelectorAll('[data-rep-period]').forEach(el => {
     el.addEventListener('click', () => {
       state.reportPeriod = el.dataset.repPeriod;
-      render();
+      await render();
     });
   });
   document.getElementById('rep-range-btn')?.addEventListener('click', () => {
@@ -908,19 +908,19 @@ function bindEvents() {
       state.reportRangeFrom = DB.dateKey(from);
       state.reportRangeTo   = DB.dateKey(new Date());
     }
-    render();
+    await render();
   });
   document.getElementById('rep-range-apply')?.addEventListener('click', () => {
     state.reportRangeFrom = document.getElementById('rep-range-from')?.value;
     state.reportRangeTo   = document.getElementById('rep-range-to')?.value;
-    render();
+    await render();
   });
 
   // Settings
   document.getElementById('toggle-labels')?.addEventListener('change', e => {
     state.showLabels = e.target.checked;
     saveSettings();
-    render();
+    await render();
   });
   document.querySelectorAll('[data-seg]').forEach(el => {
     el.addEventListener('click', () => {
@@ -929,14 +929,14 @@ function bindEvents() {
       if (type === 'size')     { state.size = val; }
       if (type === 'contrast') { state.contrast = val; }
       saveSettings();
-      render();
+      await render();
     });
   });
   document.getElementById('lang-select-settings')?.addEventListener('change', e => {
     state.lang = e.target.value;
     LS.set('lang', state.lang);
     applyTranslations();
-    render();
+    await render();
   });
   document.getElementById('export-json')?.addEventListener('click', exportJson);
   document.getElementById('export-csv')?.addEventListener('click',  exportCsv);
@@ -949,7 +949,7 @@ function bindEvents() {
     if (!ok) return;
     localStorage.clear();
     loadSettings();
-    render();
+    await render();
   });
 }
 
