@@ -127,17 +127,23 @@ function applyTranslations() {
 
 // ─── INIT ────────────────────────────────────────────────────
 async function init() {
-  const res    = await fetch('config.json');
-  state.config = await res.json();
-  state.buttons = state.config.buttons || [];
-  loadSettings();
+  try {
+    const res    = await fetch('config.json');
+    state.config = await res.json();
+    state.buttons = state.config.buttons || [];
+    loadSettings();
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(console.warn);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(console.warn);
+    }
+
+    await loadHomeData();
+    await render();
+  } catch(e) {
+    document.getElementById('app').innerHTML =
+      '<div style="padding:20px;font-family:monospace;color:red;font-size:12px">' +
+      'ERROR: ' + e.message + '<br><br>' + e.stack + '</div>';
   }
-
-  await loadHomeData();
-  await render();
 }
 
 async function loadHomeData() {
