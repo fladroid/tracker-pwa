@@ -272,7 +272,6 @@ function navBtnStyle() {
 
 function renderBottomBar(active) {
   const tabs = [
-    { id:'home',     icon:'◉', key:'nav_today' },
     { id:'history',  icon:'◫', key:'nav_history' },
     { id:'report',   icon:'📊', key:'nav_report' },
     { id:'settings', icon:'⚙', key:'nav_settings' },
