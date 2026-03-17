@@ -798,7 +798,12 @@ function bindEvents() {
   // Navigation
   document.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', async () => {
-      state.screen = el.dataset.nav;
+      const target = el.dataset.nav;
+      if (target === 'home') {
+        state.selectedDate = new Date();
+        await loadHomeData();
+      }
+      state.screen = target;
       await render();
     });
   });
