@@ -127,23 +127,17 @@ function applyTranslations() {
 
 // ─── INIT ────────────────────────────────────────────────────
 async function init() {
-  try {
-    const res    = await fetch('config.json');
-    state.config = await res.json();
-    state.buttons = state.config.buttons || [];
-    loadSettings();
+  const res    = await fetch('config.json');
+  state.config = await res.json();
+  state.buttons = state.config.buttons || [];
+  loadSettings();
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(console.warn);
-    }
-
-    await loadHomeData();
-    await render();
-  } catch(e) {
-    document.getElementById('app').innerHTML =
-      '<div style="padding:20px;font-family:monospace;color:red;font-size:12px">' +
-      'ERROR: ' + e.message + '<br><br>' + e.stack + '</div>';
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(console.warn);
   }
+
+  await loadHomeData();
+  await render();
 }
 
 async function loadHomeData() {
@@ -160,10 +154,10 @@ async function render() {
   app.style.fontSize   = css('body');
 
   switch (state.screen) {
-    case 'home':     app.innerHTML = renderHome();            break;
-    case 'history':  app.innerHTML = await renderHistory();   break;
-    case 'report':   app.innerHTML = await renderReport();    break;
-    case 'settings': app.innerHTML = await renderSettings();  break;
+    case 'home':     app.innerHTML = renderHome();     break;
+    case 'history':  app.innerHTML = renderHistory();  break;
+    case 'report':   app.innerHTML = renderReport();   break;
+    case 'settings': app.innerHTML = renderSettings(); break;
   }
   bindEvents();
 }
@@ -182,8 +176,8 @@ function renderHome() {
     const val = state.values[btn.id] || 0;
     return `
     <div class="counter-btn" style="
-      background:${val>0 ? theme('accent')+'12' : theme('surface')};
-      border:1px solid ${val>0 ? theme('accent') : theme('border')};
+      background:${theme('surface')};
+      border:1px solid ${theme('border')};
       border-radius:8px;
       padding:10px 6px;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -871,7 +865,7 @@ function bindEvents() {
   });
 
   // Lang select (home)
-  document.getElementById('lang-select')?.addEventListener('change', e => {
+  document.getElementById('lang-select')?.addEventListener('change', async e => {
     state.lang = e.target.value;
     LS.set('lang', state.lang);
     applyTranslations();
@@ -880,12 +874,12 @@ function bindEvents() {
 
   // History period
   document.querySelectorAll('[data-hist-period]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
       state.historyPeriod = el.dataset.histPeriod;
       await render();
     });
   });
-  document.getElementById('range-btn')?.addEventListener('click', () => {
+  document.getElementById('range-btn')?.addEventListener('click', async () => {
     state.historyPeriod = 'range';
     if (!state.historyRangeFrom) {
       const from = new Date(); from.setDate(from.getDate()-7);
@@ -894,7 +888,7 @@ function bindEvents() {
     }
     await render();
   });
-  document.getElementById('range-apply')?.addEventListener('click', () => {
+  document.getElementById('range-apply')?.addEventListener('click', async () => {
     state.historyRangeFrom = document.getElementById('range-from')?.value;
     state.historyRangeTo   = document.getElementById('range-to')?.value;
     await render();
@@ -902,12 +896,12 @@ function bindEvents() {
 
   // Report period
   document.querySelectorAll('[data-rep-period]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
       state.reportPeriod = el.dataset.repPeriod;
       await render();
     });
   });
-  document.getElementById('rep-range-btn')?.addEventListener('click', () => {
+  document.getElementById('rep-range-btn')?.addEventListener('click', async () => {
     state.reportPeriod = 'range';
     if (!state.reportRangeFrom) {
       const from = new Date(); from.setDate(from.getDate()-7);
@@ -916,20 +910,20 @@ function bindEvents() {
     }
     await render();
   });
-  document.getElementById('rep-range-apply')?.addEventListener('click', () => {
+  document.getElementById('rep-range-apply')?.addEventListener('click', async () => {
     state.reportRangeFrom = document.getElementById('rep-range-from')?.value;
     state.reportRangeTo   = document.getElementById('rep-range-to')?.value;
     await render();
   });
 
   // Settings
-  document.getElementById('toggle-labels')?.addEventListener('change', e => {
+  document.getElementById('toggle-labels')?.addEventListener('change', async e => {
     state.showLabels = e.target.checked;
     saveSettings();
     await render();
   });
   document.querySelectorAll('[data-seg]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
       const type = el.dataset.seg;
       const val  = el.dataset.val;
       if (type === 'size')     { state.size = val; }
@@ -938,7 +932,7 @@ function bindEvents() {
       await render();
     });
   });
-  document.getElementById('lang-select-settings')?.addEventListener('change', e => {
+  document.getElementById('lang-select-settings')?.addEventListener('change', async e => {
     state.lang = e.target.value;
     LS.set('lang', state.lang);
     applyTranslations();
