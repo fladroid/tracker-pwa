@@ -1,5 +1,5 @@
-const CACHE = 'tracker-v2';
-const ASSETS = ['/', '/index.html', '/app.js', '/db.js', '/config.json'];
+const CACHE = 'tracker-v3';
+const ASSETS = ['./', './index.html', './app.js', './db.js', './config.json', './manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
