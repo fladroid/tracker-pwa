@@ -154,10 +154,10 @@ async function render() {
   app.style.fontSize   = css('body');
 
   switch (state.screen) {
-    case 'home':     app.innerHTML = renderHome();     break;
-    case 'history':  app.innerHTML = renderHistory();  break;
-    case 'report':   app.innerHTML = renderReport();   break;
-    case 'settings': app.innerHTML = renderSettings(); break;
+    case 'home':     app.innerHTML = renderHome();             break;
+    case 'history':  app.innerHTML = await renderHistory();    break;
+    case 'report':   app.innerHTML = await renderReport();     break;
+    case 'settings': app.innerHTML = await renderSettings();   break;
   }
   bindEvents();
 }
